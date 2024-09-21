@@ -1,6 +1,6 @@
 <template>
-  <div class="max-w-4xl mx-auto p-8">
-    <h1 class="text-2xl font-bold mb-6">
+  <div class="max-w-4xl mx-auto p-8 bg-white shadow-md rounded-lg mt-12">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">
       {{ isEdit ? "Edit Post" : "Create New Post" }}
     </h1>
     <form @submit.prevent="submitPost" class="space-y-4">
@@ -8,14 +8,17 @@
         v-model="title"
         type="text"
         placeholder="Post Title"
-        class="w-full p-2 border border-gray-300 rounded"
+        class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       <textarea
         v-model="content"
         placeholder="Post Content"
-        class="w-full p-2 border border-gray-300 rounded h-48"
+        class="w-full p-3 border border-gray-300 rounded h-48 focus:outline-none focus:ring-2 focus:ring-blue-500"
       ></textarea>
-      <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">
+      <button
+        type="submit"
+        class="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
+      >
         {{ isEdit ? "Update" : "Create" }} Post
       </button>
     </form>

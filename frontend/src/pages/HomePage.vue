@@ -1,13 +1,13 @@
 <template>
-  <div class="container mx-auto">
+  <div class="container mx-auto p-6">
     <router-link
       to="/posts/create"
-      class="mb-4 inline-block bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+      class="mb-6 inline-block bg-green-500 text-white py-2 px-4 rounded shadow-md hover:bg-green-600 transition"
     >
       Create New Post
     </router-link>
     <BlogPostSearchBar :searchQuery="searchQuery" @search="searchPosts" />
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-4">
       <BlogPostCard v-for="post in posts" :key="post.id" :post="post" />
     </div>
     <BlogPagination
@@ -64,9 +64,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.container {
-  padding: 2rem;
-}
-</style>

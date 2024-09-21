@@ -30,7 +30,7 @@ axiosInstance.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const response = await axios.post("/api/token/refresh/", {
+        const response = await axiosInstance.post("/api/users/token/refresh/", {
           refresh: userStore.refreshToken,
         });
 

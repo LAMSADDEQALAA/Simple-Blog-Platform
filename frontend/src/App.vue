@@ -1,18 +1,28 @@
 <template>
-  <div>
-    <nav class="bg-gray-800 p-4">
-      <div class="container mx-auto flex justify-between">
-        <div>
-          <router-link to="/" class="text-white">Home</router-link>
+  <div class="min-h-screen bg-gray-100">
+    <nav class="bg-gray-800 p-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center">
+        <div class="text-white text-lg font-semibold">
+          <router-link to="/">Blog</router-link>
         </div>
-        <div>
-          <router-link v-if="!isAuthenticated" to="/login" class="text-white"
+        <div class="space-x-4">
+          <router-link
+            v-if="!isAuthenticated"
+            to="/login"
+            class="text-white hover:bg-gray-700 rounded px-3 py-2 transition"
             >Login</router-link
           >
-          <router-link v-if="!isAuthenticated" to="/register" class="text-white"
+          <router-link
+            v-if="!isAuthenticated"
+            to="/register"
+            class="text-white hover:bg-gray-700 rounded px-3 py-2 transition"
             >Register</router-link
           >
-          <button v-if="isAuthenticated" @click="logout" class="text-white">
+          <button
+            v-if="isAuthenticated"
+            @click="logout"
+            class="text-white hover:bg-gray-700 rounded px-3 py-2 transition"
+          >
             Logout
           </button>
         </div>
@@ -46,29 +56,6 @@ export default defineComponent({
 });
 </script>
 
-<style>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
+<style scoped>
+/* Additional styles can go here if needed */
 </style>

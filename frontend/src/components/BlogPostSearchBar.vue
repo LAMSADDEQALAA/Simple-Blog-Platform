@@ -5,7 +5,7 @@
       @input="onSearch"
       type="text"
       placeholder="Search posts..."
-      class="w-full p-2 border border-gray-300 rounded"
+      class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
     />
   </div>
 </template>
@@ -34,10 +34,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-/* Style the search input using Tailwind CSS */
-input {
-  @apply w-full p-2 border border-gray-300 rounded;
-}
-</style>

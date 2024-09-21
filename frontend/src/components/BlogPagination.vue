@@ -3,15 +3,15 @@
     <button
       @click="prevPage"
       :disabled="currentPage === 1"
-      class="px-4 py-2 mx-2 bg-gray-300 rounded disabled:bg-gray-200"
+      class="px-4 py-2 mx-2 bg-gray-300 rounded disabled:bg-gray-200 hover:bg-gray-400 transition"
     >
       Prev
     </button>
-    <span class="px-4 py-2">{{ currentPage }}</span>
+    <span class="px-4 py-2 text-lg font-semibold">{{ currentPage }}</span>
     <button
       @click="nextPage"
       :disabled="currentPage === totalPages"
-      class="px-4 py-2 mx-2 bg-gray-300 rounded disabled:bg-gray-200"
+      class="px-4 py-2 mx-2 bg-gray-300 rounded disabled:bg-gray-200 hover:bg-gray-400 transition"
     >
       Next
     </button>
@@ -26,11 +26,11 @@ export default defineComponent({
   props: {
     currentPage: {
       type: Number,
-      required: true, // Mark it as required
+      required: true,
     },
     totalPages: {
       type: Number,
-      required: true, // Mark it as required
+      required: true,
     },
   },
   emits: ["pageChange"],

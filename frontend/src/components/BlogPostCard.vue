@@ -1,13 +1,14 @@
 <template>
-  <div class="border p-4 rounded-lg shadow-md">
+  <div class="border p-4 rounded-lg shadow-md hover:shadow-lg transition">
     <h2 class="text-xl font-bold mb-2">{{ post?.title }}</h2>
     <p class="text-gray-600">By {{ post?.author.username }}</p>
     <p class="text-gray-800">{{ post?.content.substring(0, 100) }}...</p>
     <router-link
       :to="`/posts/${post?.id}`"
       class="text-blue-500 hover:underline"
-      >Read more</router-link
     >
+      Read more
+    </router-link>
     <div v-if="canEditOrDelete" class="mt-2">
       <router-link
         :to="`/posts/${post?.id}/edit`"
@@ -27,8 +28,8 @@
 
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { useUserStore } from "@/stores/userStore"; // Import user store
-import { useBlogStore } from "@/stores/blogPostStore"; // Import blog store
+import { useUserStore } from "@/stores/userStore";
+import { useBlogStore } from "@/stores/blogPostStore";
 
 export default defineComponent({
   props: {
@@ -56,5 +57,3 @@ export default defineComponent({
   },
 });
 </script>
-
-``

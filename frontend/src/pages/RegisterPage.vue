@@ -1,33 +1,40 @@
 <template>
-  <div class="max-w-md mx-auto mt-10">
-    <h1 class="text-2xl font-bold mb-4">Register</h1>
-    <form @submit.prevent="registerUser" class="space-y-4">
-      <input
-        v-model="username"
-        type="text"
-        placeholder="Username"
-        class="w-full p-2 border border-gray-300 rounded"
-      />
-      <input
-        v-model="password"
-        type="password"
-        placeholder="Password"
-        class="w-full p-2 border border-gray-300 rounded"
-      />
-      <input
-        v-model="confirmPassword"
-        type="password"
-        placeholder="confirm Password"
-        class="w-full p-2 border border-gray-300 rounded"
-      />
-      <button
-        type="submit"
-        class="bg-blue-500 text-white py-2 px-4 rounded w-full"
-      >
-        Register
-      </button>
-      <router-link to="/login" class="text-white">login</router-link>
-    </form>
+  <div class="flex items-center justify-center min-h-screen">
+    <div class="max-w-md w-full bg-white shadow-md rounded-lg p-8">
+      <h1 class="text-3xl font-bold text-center mb-6">Register</h1>
+      <form @submit.prevent="registerUser" class="space-y-6">
+        <input
+          v-model="username"
+          type="text"
+          placeholder="Username"
+          class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          v-model="password"
+          type="password"
+          placeholder="Password"
+          class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <input
+          v-model="confirmPassword"
+          type="password"
+          placeholder="Confirm Password"
+          class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          type="submit"
+          class="bg-blue-500 text-white py-3 px-4 rounded w-full hover:bg-blue-600 transition"
+        >
+          Register
+        </button>
+        <p class="text-center text-gray-600">
+          Already have an account?
+          <router-link to="/login" class="text-blue-500 hover:underline">
+            Login
+          </router-link>
+        </p>
+      </form>
+    </div>
   </div>
 </template>
 
