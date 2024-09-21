@@ -20,7 +20,7 @@ export const useUserStore = defineStore("user", {
   }),
   actions: {
     async register(userData: { username: string; password: string }) {
-      const response = await axios.post("/api/users/", userData);
+      const response = await axios.post("/api/users/register/", userData);
       this.user = response.data;
     },
     async login(credentials: { username: string; password: string }) {
