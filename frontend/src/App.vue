@@ -3,7 +3,7 @@
     <nav class="bg-gray-800 p-4">
       <div class="container mx-auto flex justify-between">
         <div>
-          <router-link to="/home" class="text-white">Home</router-link>
+          <router-link to="/" class="text-white">Home</router-link>
         </div>
         <div>
           <router-link v-if="!isAuthenticated" to="/login" class="text-white"
@@ -33,6 +33,9 @@ export default defineComponent({
     const isAuthenticated = computed(() => !!userStore.token);
     const router = useRouter();
 
+    if (!isAuthenticated.value) {
+      router.push("/login");
+    }
     const logout = () => {
       userStore.logout();
       router.push("/login");

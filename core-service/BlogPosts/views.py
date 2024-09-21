@@ -6,6 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.core.cache import cache
 from .pagination import BlogPostPagination
 from .permissions import IsAuthorOrReadOnly 
+
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer

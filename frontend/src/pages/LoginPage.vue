@@ -43,6 +43,7 @@ export default defineComponent({
         username: username.value,
         password: password.value,
       });
+      await userStore.getUserData();
       router.push("/");
     };
 

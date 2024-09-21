@@ -9,19 +9,24 @@ import { useUserStore } from "@/stores/userStore";
 const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
-  { path: "/", component: HomePage, meta: { requiresAuth: true } },
+  {
+    path: "/",
+    name: "home",
+    component: HomePage,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/posts/:id",
     component: PostPage,
     meta: { requiresAuth: true },
   },
   {
-    path: "/create",
+    path: "/posts/create",
     component: CreateEditPostPage,
     meta: { requiresAuth: true },
   },
   {
-    path: "/edit/:id",
+    path: "/posts/:id/edit",
     component: CreateEditPostPage,
     meta: { requiresAuth: true },
   },

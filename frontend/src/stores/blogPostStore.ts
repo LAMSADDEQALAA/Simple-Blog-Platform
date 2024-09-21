@@ -7,7 +7,7 @@ export interface BlogPost {
   id: number;
   title: string;
   content: string;
-  author: { username: "" };
+  author: { id: number; username: "" };
   created_at: string;
   updated_at: string;
 }

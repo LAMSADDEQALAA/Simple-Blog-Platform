@@ -1,5 +1,11 @@
 <template>
   <div class="container mx-auto">
+    <router-link
+      to="/posts/create"
+      class="mb-4 inline-block bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+    >
+      Create New Post
+    </router-link>
     <BlogPostSearchBar :searchQuery="searchQuery" @search="searchPosts" />
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       <BlogPostCard v-for="post in posts" :key="post.id" :post="post" />

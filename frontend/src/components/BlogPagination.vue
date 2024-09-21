@@ -20,6 +20,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   props: {
@@ -33,14 +34,29 @@ export default defineComponent({
     },
   },
   emits: ["pageChange"],
-  methods: {
-    prevPage() {
-      if (this.currentPage > 1) this.$emit("pageChange", this.currentPage - 1);
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages)
-        this.$emit("pageChange", this.currentPage + 1);
-    },
+  setup(props, { emit }) {
+    const router = useRouter();
+
+    const prevPage = () => {
+      if (props.currentPage > 1) {
+        const page = props.currentPage - 1;
+        emit("pageChange", page);
+        router.push({ name: "home", query: { page } });
+      }
+    };
+
+    const nextPage = () => {
+      if (props.currentPage < props.totalPages) {
+        const page = props.currentPage + 1;
+        emit("pageChange", page);
+        router.push({ name: "home", query: { page } });
+      }
+    };
+
+    return {
+      prevPage,
+      nextPage,
+    };
   },
 });
 </script>
