@@ -5,3 +5,4 @@ core-service/Users/__pycache__
 core-service/Users/migrations/__pycache__
 core-service/BlogPosts/__pycache__
 core-service/BlogPosts/migrations/__pycache__
+core-service/BlogPosts/management/commands/__pycache__
