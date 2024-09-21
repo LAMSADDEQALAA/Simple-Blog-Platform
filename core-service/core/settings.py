@@ -135,7 +135,7 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     'SIGNING_KEY': config('SIGNING_KEY'),
-    'ALGORITHM': 'HS256',
+    'ALGORITHM': config('SIGNING_ALGORITHM'),
 }
 
 CACHES = {
