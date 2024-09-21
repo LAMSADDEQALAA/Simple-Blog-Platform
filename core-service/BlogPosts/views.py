@@ -5,11 +5,11 @@ from .serializers import BlogPostSerializer, BlogPostCreateUpdateSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.cache import cache
 from .pagination import BlogPostPagination
-
+from .permissions import IsAuthorOrReadOnly 
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = BlogPost.objects.all()
     serializer_class = BlogPostSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated,IsAuthorOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['title', 'content']
     pagination_class = BlogPostPagination
