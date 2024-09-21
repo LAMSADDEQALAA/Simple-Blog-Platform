@@ -11,10 +11,10 @@
     "axios": "^1.7.7",
     "core-js": "^3.8.3",
     "lodash": "^4.17.21",
+    "notyf": "^3.10.0",
     "pinia": "^2.2.2",
     "vue": "^3.2.13",
-    "vue-router": "^4.0.3",
-    "vue-toastification": "^1.7.14"
+    "vue-router": "^4.0.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.4.0",

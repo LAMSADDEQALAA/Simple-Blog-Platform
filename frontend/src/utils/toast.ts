@@ -1,7 +1,10 @@
-import Toast from "vue-toastification";
+import { Notyf } from "notyf";
+import "notyf/notyf.min.css";
 
-const toast = Toast.useToast();
-
-export const showToast = (message: string, type = "success") => {
-  toast(message, { type });
-};
+export const notyf = new Notyf({
+  duration: 3000,
+  position: {
+    x: "right",
+    y: "top",
+  },
+});

@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import axios from "../api/axiosConfig";
 import { handleError } from "@/utils/handleError";
-import { showToast } from "../utils/toast";
+import { notyf } from "../utils/toast";
 
 interface User {
   id: number;
@@ -25,14 +25,13 @@ export const useUserStore = defineStore("user", {
       try {
         const response = await axios.post("/api/users/register/", userData);
         this.user = response.data;
-        showToast("registered successfuly!");
+        notyf.success("registered successfuly!");
       } catch (error) {
         handleError(error);
       }
     },
     async login(userData: { username: string; password: string }) {
       try {
-        console.log(process.env.VUE_APP_API_BASE_URL);
         const response = await axios.post("/api/users/token/", userData);
         this.token = response.data.access;
         this.refreshToken = response.data.refresh;
@@ -43,7 +42,7 @@ export const useUserStore = defineStore("user", {
 
         localStorage.setItem("access_token", this.token);
         localStorage.setItem("refresh_token", this.refreshToken);
-        showToast("loged in successfuly!");
+        notyf.success("loged in successfuly!");
       } catch (error) {
         handleError(error);
       }
@@ -55,7 +54,7 @@ export const useUserStore = defineStore("user", {
 
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      showToast("loged out successfuly!");
+      notyf.success("loged out successfuly!");
     },
   },
 });

@@ -1,6 +1,9 @@
+// src/stores/blogStore.ts
 import { defineStore } from "pinia";
+import axios from "../api/axiosConfig";
+import { handleError } from "../utils/handleError"; // Import your error handling function
 
-interface BlogPost {
+export interface BlogPost {
   id: number;
   title: string;
   content: string;
@@ -19,5 +22,14 @@ export const useBlogStore = defineStore("blog", {
     posts: [],
     currentPost: null,
   }),
-  actions: {},
+  actions: {
+    async fetchPosts(page = 1) {
+      try {
+        const response = await axios.get(`/api/BlogPosts/?page=${page}`);
+        this.posts = response.data;
+      } catch (error) {
+        handleError(error);
+      }
+    },
+  },
 });
