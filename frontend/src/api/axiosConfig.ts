@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useUserStore } from "../store/userStore";
+import { useUserStore } from "../stores/userStore";
 
 const axiosInstance = axios.create({
   baseURL: process.env.VUE_APP_API_BASE_URL,
@@ -35,7 +35,8 @@ axiosInstance.interceptors.response.use(
         });
 
         userStore.token = response.data.access;
-        localStorage.setItem("access_token", userStore.token); // Update local storage
+        if (userStore.token)
+          localStorage.setItem("access_token", userStore.token);
 
         axios.defaults.headers.common.Authorization = `Bearer ${userStore.token}`;
 

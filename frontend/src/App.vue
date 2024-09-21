@@ -1,12 +1,53 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <div>
+    <nav class="bg-gray-800 p-4">
+      <div class="container mx-auto flex justify-between">
+        <div>
+          <router-link to="/home" class="text-white">Home</router-link>
+        </div>
+        <div>
+          <router-link v-if="!isAuthenticated" to="/login" class="text-white"
+            >Login</router-link
+          >
+          <router-link v-if="!isAuthenticated" to="/register" class="text-white"
+            >Register</router-link
+          >
+          <button v-if="isAuthenticated" @click="logout" class="text-white">
+            Logout
+          </button>
+        </div>
+      </div>
+    </nav>
+    <router-view />
+  </div>
 </template>
 
+<script lang="ts">
+import { computed, defineComponent } from "vue";
+import { useUserStore } from "@/stores/userStore";
+import { useRouter } from "vue-router";
+
+export default defineComponent({
+  setup() {
+    const userStore = useUserStore();
+    const isAuthenticated = computed(() => !!userStore.token);
+    const router = useRouter();
+
+    const logout = () => {
+      userStore.logout();
+      router.push("/login");
+    };
+
+    return { isAuthenticated, logout };
+  },
+});
+</script>
+
 <style>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
