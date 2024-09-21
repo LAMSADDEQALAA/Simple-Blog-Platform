@@ -11,6 +11,7 @@ core-service/BlogPosts/management/commands/__pycache__
 #comments-service
 comments-service/.venv
 comments-service/.env
+comments-service/app/__pycache__
 
 #frontend
 frontend/.DS_Store
