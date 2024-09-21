@@ -3,11 +3,11 @@ import axios from "../api/axiosConfig";
 import { handleError } from "@/utils/handleError";
 import { notyf } from "../utils/toast";
 
-interface BlogPost {
+export interface BlogPost {
   id: number;
   title: string;
   content: string;
-  author: string;
+  author: { username: "" };
   created_at: string;
   updated_at: string;
 }
@@ -31,7 +31,7 @@ export const useBlogStore = defineStore("blog", {
           `/api/BlogPosts/?search=${query}&page=${page}`
         );
         this.posts = response.data.results;
-        this.totalPages = response.data.count;
+        this.totalPages = Math.ceil(response.data.count / 15);
       } catch (error) {
         handleError(error);
       }

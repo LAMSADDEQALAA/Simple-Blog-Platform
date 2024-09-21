@@ -41,6 +41,7 @@ export default defineComponent({
 
     const searchPosts = async (query: string) => {
       searchQuery.value = query;
+      currentPage.value = 1;
       await loadPosts();
     };
 
