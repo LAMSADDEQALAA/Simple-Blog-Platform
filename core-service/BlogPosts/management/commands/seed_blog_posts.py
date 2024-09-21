@@ -13,7 +13,7 @@ class Command(BaseCommand):
         
         users = User.objects.all()
         
-        for i in range(10):
+        for i in range(50):
             title = f'Blog Post {i + 1}'
             content = f'This is the content for blog post {i + 1}.'
             author = random.choice(users)
