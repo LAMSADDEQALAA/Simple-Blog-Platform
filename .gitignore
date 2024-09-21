@@ -1,2 +1,3 @@
 core-service/.venv
 core-service/.env
+core-service/core/__pycache__
