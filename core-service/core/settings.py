@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'Users',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,10 @@ REST_FRAMEWORK = {
     ),
 }
 
+SIMPLE_JWT = {
+    'SIGNING_KEY': config('SIGNING_KEY'),
+    'ALGORITHM': 'HS256',
+}
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 

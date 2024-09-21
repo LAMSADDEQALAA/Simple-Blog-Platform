@@ -1,3 +1,5 @@
 core-service/.venv
 core-service/.env
 core-service/core/__pycache__
+core-service/Users/__pycache__
+core-service/Users/migrations/__pycache__
