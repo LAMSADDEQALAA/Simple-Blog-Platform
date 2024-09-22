@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routes import comment_router
-from .middlewares import JWTValidationMiddleware
 from .database import engine,Base
+
 app = FastAPI()
     
 app.add_middleware(
@@ -12,7 +12,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.add_middleware(JWTValidationMiddleware)
 
 @app.on_event("startup")
 async def startup():

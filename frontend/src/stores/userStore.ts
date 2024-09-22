@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "../api/axiosConfig";
+import { axiosCore } from "../api/axiosConfig";
 import { handleError } from "@/utils/handleError";
 import { notyf } from "../utils/toast";
 
@@ -25,7 +25,7 @@ export const useUserStore = defineStore("user", {
   actions: {
     async register(userData: { username: string; password: string }) {
       try {
-        const response = await axios.post("/api/users/register/", userData);
+        const response = await axiosCore.post("/api/users/register/", userData);
         this.user = response.data;
         notyf.success("registered successfuly!");
       } catch (error) {
@@ -34,7 +34,7 @@ export const useUserStore = defineStore("user", {
     },
     async login(userData: { username: string; password: string }) {
       try {
-        const response = await axios.post("/api/users/token/", userData);
+        const response = await axiosCore.post("/api/users/token/", userData);
         this.token = response.data.access;
         this.refreshToken = response.data.refresh;
 
@@ -51,7 +51,7 @@ export const useUserStore = defineStore("user", {
     },
     async getUserData() {
       try {
-        const response = await axios.get("/api/users/profile/");
+        const response = await axiosCore.get("/api/users/profile/");
         this.user = response.data;
         if (this.user != null) {
           localStorage.setItem("user", JSON.stringify(this.user));

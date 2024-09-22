@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "../api/axiosConfig";
+import { axiosCore } from "../api/axiosConfig";
 import { handleError } from "@/utils/handleError";
 import { notyf } from "../utils/toast";
 
@@ -27,7 +27,7 @@ export const useBlogStore = defineStore("blog", {
   actions: {
     async fetchPosts(query = "", page = 1) {
       try {
-        const response = await axios.get(
+        const response = await axiosCore.get(
           `/api/BlogPosts/?search=${query}&page=${page}`
         );
         this.posts = response.data.results;
@@ -38,7 +38,7 @@ export const useBlogStore = defineStore("blog", {
     },
     async fetchPost(postId: number) {
       try {
-        const response = await axios.get(`/api/BlogPosts/${postId}/`);
+        const response = await axiosCore.get(`/api/BlogPosts/${postId}/`);
         this.currentPost = response.data;
       } catch (error) {
         handleError(error);
@@ -46,7 +46,7 @@ export const useBlogStore = defineStore("blog", {
     },
     async createPost(postData: { title: string; content: string }) {
       try {
-        await axios.post("/api/BlogPosts/", postData);
+        await axiosCore.post("/api/BlogPosts/", postData);
         await this.fetchPosts();
         notyf.success("BlogPost created successfuly!");
       } catch (error) {
@@ -58,7 +58,7 @@ export const useBlogStore = defineStore("blog", {
       postData: { title: string; content: string }
     ) {
       try {
-        await axios.put(`/api/BlogPosts/${postId}/`, postData);
+        await axiosCore.put(`/api/BlogPosts/${postId}/`, postData);
         await this.fetchPosts();
         notyf.success("BlogPost updated successfuly!");
       } catch (error) {
@@ -67,7 +67,7 @@ export const useBlogStore = defineStore("blog", {
     },
     async deletePost(postId: number) {
       try {
-        await axios.delete(`/api/BlogPosts/${postId}/`);
+        await axiosCore.delete(`/api/BlogPosts/${postId}/`);
         await this.fetchPosts();
         notyf.success("BlogPost deleted successfuly!");
       } catch (error) {

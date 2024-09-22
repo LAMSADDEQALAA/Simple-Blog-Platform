@@ -46,8 +46,14 @@
           :key="comment.id"
           class="mb-4 p-4 border border-gray-200 rounded-lg"
         >
-          <p class="text-gray-600 font-semibold">{{ comment.author }}</p>
+          <p class="text-gray-600 font-semibold">{{ comment.user_id }}</p>
           <p class="text-gray-700">{{ comment.content }}</p>
+          <button
+            v-if="canDeleteComment(comment)"
+            @click="deleteComment(comment.id)"
+          >
+            Delete
+          </button>
         </div>
       </div>
     </div>
@@ -58,41 +64,20 @@
 import { defineComponent, ref, onMounted, computed } from "vue";
 import { useBlogStore, BlogPost } from "@/stores/blogPostStore";
 import { useUserStore } from "@/stores/userStore";
+import { useCommentStore, Comment } from "@/stores/commentStore";
 import { useRoute } from "vue-router";
 
 export default defineComponent({
   setup() {
     const blogStore = useBlogStore();
     const userStore = useUserStore();
+    const commentStore = useCommentStore();
+
     const route = useRoute();
     const post = ref<BlogPost | null>(null);
-    const comments = ref([
-      { id: 1, author: "John Doe", content: "Great post!" },
-      { id: 2, author: "Jane Smith", content: "Thanks for sharing!" },
-      { id: 3, author: "Bob Johnson", content: "Very informative." },
-      { id: 4, author: "Alice Walker", content: "I learned a lot!" },
-      { id: 5, author: "Michael Brown", content: "Fantastic read!" },
-      { id: 6, author: "Emily Davis", content: "Well written!" },
-      { id: 7, author: "James Wilson", content: "I agree with you." },
-      { id: 8, author: "Linda Taylor", content: "Insightful!" },
-      { id: 9, author: "Robert Anderson", content: "Keep it up!" },
-      { id: 10, author: "Patricia Thomas", content: "Very helpful!" },
-      { id: 11, author: "David Martinez", content: "Excellent article!" },
-      {
-        id: 12,
-        author: "Jennifer Garcia",
-        content: "I appreciate your insights.",
-      },
-      { id: 13, author: "Charles Rodriguez", content: "This was great!" },
-      { id: 14, author: "Susan Lee", content: "Love this content!" },
-      { id: 15, author: "Joseph Gonzalez", content: "Informative post!" },
-      { id: 16, author: "Mary Perez", content: "I enjoyed reading this." },
-      { id: 17, author: "Thomas Wilson", content: "So interesting!" },
-      { id: 18, author: "Lisa White", content: "Can't wait for more!" },
-      { id: 19, author: "Daniel Harris", content: "This is a gem!" },
-      { id: 20, author: "Karen Clark", content: "You made my day!" },
-    ]);
+    const comments = ref<Comment[] | null>(null);
     const newComment = ref("");
+    const postId = Number(route.params.id);
 
     const deletePost = async (postId: number) => {
       const confirmed = confirm("Are you sure you want to delete this post?");
@@ -102,7 +87,6 @@ export default defineComponent({
     };
 
     const loadPost = async () => {
-      const postId = Number(route.params.id);
       if (!isNaN(postId)) {
         await blogStore.fetchPost(postId);
         post.value = blogStore.currentPost;
@@ -114,17 +98,26 @@ export default defineComponent({
     });
 
     const addComment = () => {
-      if (newComment.value.trim()) {
-        comments.value.push({
-          id: comments.value.length + 1,
-          author: userStore.user?.username || "Anonymous",
-          content: newComment.value.trim(),
-        });
-        newComment.value = ""; // Clear the input after submission
+      const content = newComment.value.trim();
+      if (content && postId) {
+        commentStore.addComment(postId, content);
+        newComment.value = "";
       }
     };
 
-    onMounted(loadPost);
+    const deleteComment = (commentId: number) => {
+      commentStore.deleteComment(postId, commentId);
+    };
+
+    const canDeleteComment = (user_id: number) => {
+      return userStore.user?.id === user_id || userStore.user?.id === user_id;
+    };
+
+    onMounted(async () => {
+      await loadPost();
+      await commentStore.fetchComments(postId);
+      comments.value = commentStore.comments;
+    });
 
     return {
       post,
@@ -133,6 +126,8 @@ export default defineComponent({
       comments,
       newComment,
       addComment,
+      deleteComment,
+      canDeleteComment,
     };
   },
 });
