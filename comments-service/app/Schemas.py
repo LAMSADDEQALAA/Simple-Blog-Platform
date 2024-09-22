@@ -1,5 +1,4 @@
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, ConfigDict
 
 class CommentBase(BaseModel):
     content: str
@@ -10,7 +9,7 @@ class CommentCreate(CommentBase):
     pass
 
 class Comment(CommentBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
 
-    class Config:
-        orm_mode = True

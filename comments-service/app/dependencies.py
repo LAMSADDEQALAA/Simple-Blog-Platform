@@ -1,8 +1,11 @@
-from .database import SessionLocal
+from .database import factory
+from sqlalchemy import exc
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    async with factory() as session:
+        try:
+            yield session
+            await session.commit()
+        except exc.SQLAlchemyError:
+            await session.rollback()
+            raise

@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, Text
-from sqlalchemy.ext.declarative import declarative_base
 from .database import Base
 
 class Comment(Base):
@@ -10,5 +9,3 @@ class Comment(Base):
     user_id = Column(Integer, index=True)
     content = Column(Text, nullable=False)
 
-    def __repr__(self):
-        return f"<Comment(id={self.id}, post_id={self.post_id}, user_id={self.user_id}, content='{self.content}')>"
