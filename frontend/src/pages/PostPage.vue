@@ -25,20 +25,31 @@
 
     <h2 class="text-3xl font-bold mt-8 mb-4 text-gray-800">Comments</h2>
     <div class="border-t border-gray-300 pt-4">
-      <div class="mt-4 mb-4">
-        <input
-          v-model="newComment"
-          type="text"
-          placeholder="Add a comment..."
-          class="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
-        />
-        <button
-          @click="addComment"
-          class="mt-2 text-white bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded-lg shadow transition"
-        >
-          Submit
-        </button>
-      </div>
+      <form @submit.prevent="submitAddComment">
+        <div class="mt-4 mb-4">
+          <input
+            :value="addCommentForm.values.newComment"
+            @input="event => addCommentForm.setFieldValue('newComment', (event.target as HTMLInputElement).value)"
+            placeholder="Add a comment..."
+            class="border border-gray-300 rounded-lg p-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <p
+            v-if="
+              addCommentForm.errors.value.newComment &&
+              addCommentForm.isFieldTouched('newComment')
+            "
+            class="text-red-500"
+          >
+            {{ addCommentForm.errors.value.newComment }}
+          </p>
+          <button
+            type="submit"
+            class="mt-2 text-white bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded-lg shadow transition"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
 
       <div class="max-h-60 overflow-y-auto" style="max-height: 300px">
         <div
@@ -46,14 +57,27 @@
           :key="comment.id"
           class="mb-4 p-4 border border-gray-200 rounded-lg relative"
         >
-          <div v-if="editingCommentId === comment.id">
+          <form
+            v-if="editingCommentId === comment.id"
+            @submit.prevent="submitEditComment(comment.id)"
+          >
             <input
-              v-model="editedComment"
-              type="text"
+              :value="editCommentForm.values.editedComment"
+              @input="event => editCommentForm.setFieldValue('editedComment', (event.target as HTMLInputElement).value)"
               class="border border-gray-300 rounded-lg p-2 w-full mb-2"
             />
+            <p
+              v-if="
+                editCommentForm.errors.value.editedComment &&
+                editCommentForm.isFieldTouched('editedComment')
+              "
+              class="text-red-500"
+            >
+              {{ editCommentForm.errors.value.editedComment }}
+            </p>
+
             <button
-              @click="updateComment(comment.id)"
+              type="submit"
               class="text-white bg-green-500 hover:bg-green-600 py-2 px-4 rounded-lg shadow transition"
             >
               Update
@@ -64,7 +88,7 @@
             >
               Cancel
             </button>
-          </div>
+          </form>
           <div v-else>
             <p class="text-gray-600 font-semibold">{{ comment.username }}</p>
             <p class="text-gray-700">{{ comment.content }}</p>
@@ -92,12 +116,15 @@
     </div>
   </div>
 </template>
+
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed, watch } from "vue";
+import { defineComponent, computed, onMounted, ref, watch } from "vue";
 import { useBlogStore, BlogPost } from "@/stores/blogPostStore";
 import { useUserStore } from "@/stores/userStore";
 import { useCommentStore, Comment } from "@/stores/commentStore";
 import { useRoute } from "vue-router";
+import { useForm } from "vee-validate";
+import * as yup from "yup";
 
 export default defineComponent({
   setup() {
@@ -108,10 +135,64 @@ export default defineComponent({
     const route = useRoute();
     const post = ref<BlogPost | null>(null);
     const comments = ref<Comment[] | null>(null);
-    const newComment = ref("");
-    const editedComment = ref("");
     const editingCommentId = ref<number | null>(null);
     const postId = Number(route.params.id);
+
+    const canEditOrDelete = computed(
+      () => userStore.user?.id === post.value?.author.id
+    );
+
+    const newCommentSchema = yup.object({
+      newComment: yup
+        .string()
+        .required("Comment is required")
+        .min(3, "Must be at least 3 characters"),
+    });
+
+    const editCommentSchema = yup.object({
+      editedComment: yup
+        .string()
+        .required("Comment is required")
+        .min(3, "Must be at least 3 characters"),
+    });
+
+    // Form instances for both add and edit
+    const addCommentForm = useForm({
+      validationSchema: newCommentSchema,
+      initialValues: { newComment: "" },
+    });
+
+    const editCommentForm = useForm({
+      validationSchema: editCommentSchema,
+      initialValues: { editedComment: "" },
+    });
+
+    const submitAddComment = async () => {
+      const valid = await addCommentForm.validate();
+      if (!valid) return;
+
+      const content = addCommentForm.values.newComment.trim();
+      const user_id = userStore.user?.id;
+      if (content && !isNaN(postId) && user_id) {
+        await commentStore.addComment({ user_id, content, post_id: postId });
+        addCommentForm.resetForm(); // Reset form after submission
+      }
+    };
+
+    const submitEditComment = async (commentId: number) => {
+      const valid = await editCommentForm.validate();
+      if (!valid) return;
+
+      const content = editCommentForm.values.editedComment.trim();
+      if (content) {
+        await commentStore.updateComment(postId, commentId, content);
+        editingCommentId.value = null;
+        editCommentForm.resetForm(); // Reset form after submission
+      }
+    };
+
+    const deleteComment = async (commentId: number) =>
+      await commentStore.deleteComment(postId, commentId);
 
     const deletePost = async (postId: number) => {
       const confirmed = confirm("Are you sure you want to delete this post?");
@@ -120,56 +201,21 @@ export default defineComponent({
       }
     };
 
+    const startEdit = (comment: Comment) => {
+      editingCommentId.value = comment.id;
+      editCommentForm.setFieldValue("editedComment", comment.content);
+    };
+
+    const cancelEdit = () => {
+      editingCommentId.value = null;
+      editCommentForm.resetForm(); // Reset the edit form
+    };
+
     const loadPost = async () => {
       if (!isNaN(postId)) {
         await blogStore.fetchPost(postId);
         post.value = blogStore.currentPost;
       }
-    };
-
-    const canEditOrDelete = computed(() => {
-      return userStore.user?.id === post.value?.author.id;
-    });
-
-    const addComment = async () => {
-      const content = newComment.value.trim();
-      const user_id = userStore.user?.id;
-      if (content && !isNaN(postId) && user_id) {
-        const data = {
-          user_id,
-          content,
-          post_id: postId,
-        };
-        await commentStore.addComment(data);
-        newComment.value = "";
-      }
-    };
-
-    const deleteComment = async (commentId: number) => {
-      await commentStore.deleteComment(postId, commentId);
-    };
-
-    const canDeleteUpdateComment = (user_id: number) => {
-      return userStore.user?.id === user_id;
-    };
-
-    const startEdit = (comment: Comment) => {
-      editingCommentId.value = comment.id;
-      editedComment.value = comment.content;
-    };
-
-    const updateComment = async (commentId: number) => {
-      const content = editedComment.value.trim();
-      if (content) {
-        await commentStore.updateComment(postId, commentId, content);
-        editingCommentId.value = null;
-        editedComment.value = "";
-      }
-    };
-
-    const cancelEdit = () => {
-      editingCommentId.value = null;
-      editedComment.value = "";
     };
 
     watch(
@@ -187,6 +233,9 @@ export default defineComponent({
       );
     };
 
+    const canDeleteUpdateComment = (user_id: number) =>
+      userStore.user?.id === user_id;
+
     onMounted(async () => {
       await loadPost();
       await loadComments();
@@ -194,18 +243,18 @@ export default defineComponent({
 
     return {
       post,
-      deletePost,
+      addCommentForm,
+      editCommentForm,
+      submitAddComment,
+      submitEditComment,
+      deleteComment,
+      startEdit,
+      cancelEdit,
       canEditOrDelete,
       comments,
-      newComment,
-      addComment,
-      deleteComment,
       canDeleteUpdateComment,
-      startEdit,
-      updateComment,
-      cancelEdit,
       editingCommentId,
-      editedComment,
+      deletePost,
     };
   },
 });

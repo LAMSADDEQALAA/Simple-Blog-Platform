@@ -30,8 +30,8 @@ const createAxiosInstance = (baseURL: string) => {
         originalRequest._retry = true;
 
         try {
-          const response = await axiosInstance.post(
-            "/api/users/token/refresh/",
+          const response = await axios.post(
+            `${process.env.VUE_APP_CORE_SERVICE_URL}/api/users/token/refresh/`,
             {
               refresh: userStore.refreshToken,
             }

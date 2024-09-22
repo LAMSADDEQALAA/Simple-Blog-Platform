@@ -13,8 +13,10 @@
     "lodash": "^4.17.21",
     "notyf": "^3.10.0",
     "pinia": "^2.2.2",
+    "vee-validate": "^4.13.2",
     "vue": "^3.2.13",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.190",
