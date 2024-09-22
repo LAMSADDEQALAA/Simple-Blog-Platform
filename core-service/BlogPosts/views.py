@@ -20,6 +20,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         cached_response = cache.get(cache_key)
 
         if cached_response:
+            print("returned from cache")
             return Response(cached_response)
 
         queryset = self.filter_queryset(self.get_queryset())
@@ -28,6 +29,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(page, many=True)
             paginated_response = self.get_paginated_response(serializer.data).data
             cache.set(cache_key, paginated_response, 60 * 15)
+            print("not returned from cache")
             return Response(paginated_response)
 
         return Response({"detail": "No data available"}, status=204)

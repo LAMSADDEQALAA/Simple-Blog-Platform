@@ -4,9 +4,11 @@ from sqlalchemy.future import select
 from .dependencies import get_db
 from . import models, schemas
 from typing import List
+from .cache import cache
+import logging
 
+logger = logging.getLogger()
 comment_router = APIRouter(prefix="/api")
-
 
 @comment_router.get("/comments", response_model=List[schemas.Comment])
 async def read_comments(db: AsyncSession = Depends(get_db)):
@@ -15,9 +17,20 @@ async def read_comments(db: AsyncSession = Depends(get_db)):
 
 
 @comment_router.get("/posts/{post_id}/comments", response_model=List[schemas.Comment])
-async def read_comments(post_id: int,db: AsyncSession = Depends(get_db)):
+async def read_comments(post_id: int, db: AsyncSession = Depends(get_db)):
+    cache_key = f"comments_post_{post_id}"
+    cached_comments = await cache.get(cache_key)
+
+    if cached_comments is not None:
+        logger.info("returned from cache")
+        return cached_comments
+
     comments = await db.scalars(select(models.Comment).filter(models.Comment.post_id == post_id))
-    return [schemas.Comment.model_validate(comment) for comment in comments]
+    comment_list = [schemas.Comment.model_validate(comment).model_dump() for comment in comments]
+
+    await cache.set(cache_key, comment_list, ttl=60*15)
+    logger.info("not returned from cache")
+    return comment_list
 
 
 @comment_router.post("/comments",status_code=status.HTTP_201_CREATED)
