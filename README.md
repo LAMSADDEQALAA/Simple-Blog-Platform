@@ -96,7 +96,7 @@ Using Redis for caching in both the FastAPI and Django REST Framework (DRF) serv
 
 In summary, using Redis for caching in both the FastAPI and DRF services enhances the overall architecture by improving scalability, performance, and data consistency while simplifying cache management across services.
 
-## Caching Strategy: Benefits of Query Parameter-Based Caching
+### Caching Strategy: Benefits of Query Parameter-Based Caching
 
 Caching based on query parameters for search and pagination offers several advantages:
 
@@ -202,8 +202,6 @@ Caching based on query parameters for search and pagination offers several advan
     - **204 No Content**: Successfully deleted the comment.
     - **404 Not Found**: If the comment does not exist.
     - **401 Unauthorized**: If the user is not authenticated.
-
-## API Documentation
 
 ### Core Service (Django DRF)
 
