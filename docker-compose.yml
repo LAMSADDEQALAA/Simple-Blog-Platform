@@ -25,8 +25,10 @@ services:
     ports:
       - "8001:8001"
     depends_on:
-      - db_comments
-      - redis
+      db_comments:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - blog_network
 
@@ -66,6 +68,11 @@ services:
       - "3306:3306"
     networks:
       - blog_network
+    healthcheck:
+      test: ["CMD", "mysql", "-u", "root", "-proot", "--execute", "SHOW DATABASES;"]
+      interval: 3s
+      retries: 5
+      timeout: 5s
 
   redis:
     image: redis:alpine

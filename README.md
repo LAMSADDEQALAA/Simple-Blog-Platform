@@ -19,7 +19,7 @@ The Blog Platform is a full-stack application consisting of a Django REST Framew
 
 ## Setup Instructions for Running the Project Using Docker Compose
 
-### Prerequisites
+### Prerequisites 
 
 - Ensure you have [Docker](https://www.docker.com/products/docker-desktop) and [Docker Compose](https://docs.docker.com/compose/) installed on your machine.
 
@@ -29,6 +29,58 @@ The Blog Platform is a full-stack application consisting of a Django REST Framew
    ```bash
    git clone https://github.com/LAMSADDEQALAA/blog-platform
    cd blog-platform
+
+- Ensure you have a `.env` file in each service's root folder. This file should contain the necessary environment variables required for each service to function properly. Here’s a brief example of what to include:
+
+  - For **Django (DRF)**:
+    ```
+    SECRET_KEY=your_django_secret_key
+    DEBUG=True
+    # JWT
+    SIGNING_KEY=your_shared_signing_key
+    SIGNING_ALGORITHM=HS256
+    # DB credentials
+    POSTGRES_DB=blog_db
+    POSTGRES_USER=blog_user
+    POSTGRES_PASSWORD=your_password
+    POSTGRES_HOST=localhost
+    POSTGRES_PORT=5432
+    # REDIS
+    REDIS_URL=redis://localhost:6379
+    ```
+
+  - For **FastAPI**:
+    ```
+    MYSQL_DB=comments_db
+    MYSQL_USER=comments_user
+    MYSQL_PASSWORD=your_password
+    MYSQL_HOST=localhost
+    MYSQL_PORT=3306
+
+    # JWT
+    SIGNING_KEY=your_shared_signing_key
+    SIGNING_ALGORITHM=HS256
+    # REDIS
+    REDIS_URL=redis://localhost:6379
+    ```
+
+  - For **Vue.js**:
+    ```
+    VUE_APP_CORE_SERVICE_URL=http://localhost:8000
+    VUE_APP_COMMENT_SERVICE_URL=http://localhost:8001/
+    ```
+
+- Ensure you have a `shared.env` file in the root project directory. This file should contain shared database credentials and configurations for both services:
+    ```
+    POSTGRES_DB=blog_db
+    POSTGRES_USER=blog_user
+    POSTGRES_PASSWORD=your_password
+
+    MYSQL_ROOT_PASSWORD=root_password
+    MYSQL_DATABASE=comments_db
+    ```
+- Make sure that the database hosts (e.g., `localhost`) and the Redis hosts (e.g., `localhost`) in your `.env` files match the corresponding service names defined in your `docker-compose.yml` file.
+- Make sure that the `SIGNING_KEY` in both the Django (DRF) and FastAPI configurations is the same to allow users to access FastAPI endpoints using their access tokens acquired from DRF.
 
 2. **Build the Docker Images**:
     ```bash
@@ -42,7 +94,7 @@ The Blog Platform is a full-stack application consisting of a Django REST Framew
     ```bash
     docker-compose down
 
-## Access the Services:
+#### Access the Services:
 
 - **Django (DRF) API**: http://localhost:8000/api/
 - **Vue.js Frontend**: http://localhost:8080/
@@ -72,7 +124,7 @@ In summary, this project architecture enhances maintainability, performance, sca
 
 In this architecture, the **Core Service** (Django DRF) and **Comments Service** (FastAPI) do not communicate directly. Instead, the comment model includes a `user_id`, which refers to the user in the Core Service. This user information is mapped on the frontend.
 
-### Rationale for This Approach
+#### Rationale for This Approach
 
 1. **Decoupling Services**: By avoiding direct communication between the two services, we achieve a cleaner separation of concerns. Each service can evolve independently without affecting the other, promoting better maintainability and scalability.
 
@@ -110,12 +162,50 @@ Caching based on query parameters for search and pagination offers several advan
 
 5. **Improved User Experience**: Faster response times and reduced latency lead to a smoother user experience, particularly when navigating through large datasets or performing complex searches.
 
+### Use of Axios Interceptors for Token Refreshing
+
+In our architecture, we utilize Axios interceptors to manage token refreshing seamlessly. This approach offers several benefits:
+
+1. **Centralized Token Management**: By using interceptors, we can handle token refresh logic in one place, ensuring that all outgoing requests automatically check the validity of the access token and refresh it if necessary. This minimizes code duplication across different components.
+
+2. **Improved User Experience**: Users do not experience interruptions during their session. If an access token expires, the interceptor automatically refreshes it in the background, allowing users to continue using the application without needing to log in again.
+
+3. **Error Handling**: Interceptors provide a mechanism to handle authentication errors globally. If a refresh token fails or the user is not authenticated, we can intercept the response and redirect the user to the login page or display an appropriate error message.
+
+4. **Performance Optimization**: By refreshing tokens only when needed and managing them through interceptors, we reduce unnecessary requests to the authentication server, optimizing the overall performance of the application.
+
+Overall, this architecture choice enhances security, user experience, and maintainability in managing authentication tokens.
+
+### Use of Debouncing for Search Functionality
+
+We implemented debouncing in our search functionality to enhance both performance and user experience. This approach provides several key benefits:
+
+1. **Reduced Number of API Calls**: Debouncing limits the frequency of API requests triggered by user input. Instead of sending a request for every keystroke, it only sends a request after the user has stopped typing for a specified duration. This minimizes unnecessary load on the backend.
+
+2. **Improved Application Performance**: By decreasing the number of API calls, we reduce server load and bandwidth usage, leading to better overall performance of the application, especially during peak usage times.
+
+3. **Enhanced User Experience**: Debouncing ensures that users receive search results that are more relevant and up-to-date without experiencing lag. Users can type freely without the frustration of seeing results that may not match their current input.
+
+4. **Preventing Redundant Processing**: With debouncing, we avoid processing multiple rapid requests for the same search query. This leads to more efficient handling of requests on the server side, reducing processing overhead.
+
+Incorporating debouncing into the search functionality results in a smoother, more responsive application that effectively meets user needs while optimizing resource usage.
+
+
+
+
+
+
+
 
 ## API Documentation
 
 ### Comments Service (FastAPI)
 
-- **Base URL**: `/api`
+### Comments Endpoints
+
+- **Users**
+  - **Endpoint**: `/api`
+  - **Description**: Manage comments.
 
 #### Endpoints
 
@@ -205,9 +295,13 @@ Caching based on query parameters for search and pagination offers several advan
 
 ### Core Service (Django DRF)
 
-- **Base URL**: `/api/users`
+### Users Endpoints
 
-#### User Endpoints
+- **Users**
+  - **Endpoint**: `/api/users`
+  - **Description**: Manage Authentication and users related data.
+
+#### Endpoints
 
 - **User Registration**
   - **Endpoint**: `POST /register/`
@@ -308,7 +402,7 @@ Caching based on query parameters for search and pagination offers several advan
   - **Endpoint**: `/api/BlogPosts/`
   - **Description**: Manage blog posts.
   
-#### Blog Post Operations
+#### Endpoints
 
 - **List Blog Posts**
   - **Method**: `GET`
