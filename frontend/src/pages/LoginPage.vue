@@ -57,6 +57,7 @@ export default defineComponent({
         password: password.value,
       });
       await userStore.getUserData();
+
       router.push("/");
     };
 

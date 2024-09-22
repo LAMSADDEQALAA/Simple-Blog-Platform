@@ -3,7 +3,7 @@ import { axiosCore } from "../api/axiosConfig";
 import { handleError } from "@/utils/handleError";
 import { notyf } from "../utils/toast";
 
-interface User {
+export interface User {
   id: number;
   username: string;
 }

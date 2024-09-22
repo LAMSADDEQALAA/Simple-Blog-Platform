@@ -1,24 +1,27 @@
 import { defineStore } from "pinia";
-import { axiosComment } from "../api/axiosConfig";
+import { axiosComment, axiosCore } from "../api/axiosConfig";
 import { handleError } from "../utils/handleError";
 import { notyf } from "../utils/toast";
-
+import { User } from "../stores/userStore";
 export interface Comment {
   id: number;
   post_id: number;
   user_id: number;
   content: string;
+  username?: string;
 }
 
 interface CommentState {
   comments: Comment[];
   totalPages: number;
+  users: User[];
 }
 
 export const useCommentStore = defineStore("comment", {
   state: (): CommentState => ({
     comments: [],
     totalPages: 1,
+    users: [],
   }),
   actions: {
     async fetchComments(postId: number) {
@@ -61,6 +64,27 @@ export const useCommentStore = defineStore("comment", {
       } catch (error) {
         handleError(error);
       }
+    },
+    async fetchUsersByIds(userIds: number[]) {
+      try {
+        const response = await axiosCore.get("/api/users/", {
+          params: { ids: userIds.join(",") },
+        });
+        this.users = response.data.results;
+      } catch (error) {
+        handleError(error);
+      }
+    },
+    async getCommentsWithUsernames(comments: Comment[]) {
+      const userIds = comments.map((comment) => comment.user_id);
+      await this.fetchUsersByIds(userIds);
+      return comments.map((comment) => {
+        const user = this.users.find((user) => user.id === comment.user_id);
+        return {
+          ...comment,
+          username: user ? user.username : "Unknown",
+        };
+      });
     },
   },
 });

@@ -66,7 +66,7 @@
             </button>
           </div>
           <div v-else>
-            <p class="text-gray-600 font-semibold">{{ comment.user_id }}</p>
+            <p class="text-gray-600 font-semibold">{{ comment.username }}</p>
             <p class="text-gray-700">{{ comment.content }}</p>
           </div>
 
@@ -174,14 +174,22 @@ export default defineComponent({
 
     watch(
       () => commentStore.comments,
-      (newComments) => {
-        comments.value = newComments;
+      async (newComments) => {
+        comments.value = await commentStore.getCommentsWithUsernames(
+          newComments
+        );
       }
     );
+    const loadComments = async () => {
+      await commentStore.fetchComments(postId);
+      comments.value = await commentStore.getCommentsWithUsernames(
+        commentStore.comments
+      );
+    };
 
     onMounted(async () => {
       await loadPost();
-      await commentStore.fetchComments(postId);
+      await loadComments();
     });
 
     return {
