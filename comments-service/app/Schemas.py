@@ -2,8 +2,11 @@ from pydantic import BaseModel, ConfigDict
 
 class CommentBase(BaseModel):
     content: str
-    post_id: int
     user_id: int
+    post_id: int
+
+class CommentUpdate(BaseModel):
+    content: str
 
 class CommentCreate(CommentBase):
     pass

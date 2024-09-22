@@ -9,4 +9,4 @@ class Command(BaseCommand):
 
         BlogPost.objects.all().delete()
 
-        self.stdout.write(self.style.SUCCESS('BlogPost deletion completed.'))
+        self.stdout.write(self.style.SUCCESS('BlogPosts deletion completed.'))

@@ -36,6 +36,7 @@
 import { computed, defineComponent } from "vue";
 import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "vue-router";
+import { notyf } from "./utils/toast";
 
 export default defineComponent({
   setup() {
@@ -49,6 +50,7 @@ export default defineComponent({
     const logout = () => {
       userStore.logout();
       router.push("/login");
+      notyf.success("loged out successfuly!");
     };
 
     return { isAuthenticated, logout };

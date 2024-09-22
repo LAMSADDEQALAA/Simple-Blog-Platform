@@ -31,18 +31,31 @@ export const useCommentStore = defineStore("comment", {
         handleError(error);
       }
     },
-    async addComment(postId: number, content: string) {
+    async addComment(data: {
+      user_id: number;
+      content: string;
+      post_id: number;
+    }) {
       try {
-        await axiosComment.post(`/api/posts/${postId}/comments`, { content });
-        await this.fetchComments(postId);
+        await axiosComment.post(`/api/comments`, data);
+        await this.fetchComments(data.post_id);
         notyf.success("Comment added successfully!");
+      } catch (error) {
+        handleError(error);
+      }
+    },
+    async updateComment(postId: number, commentId: number, content: string) {
+      try {
+        await axiosComment.put(`/api/comments/${commentId}`, { content });
+        await this.fetchComments(postId);
+        notyf.success("Comment updated successfully!");
       } catch (error) {
         handleError(error);
       }
     },
     async deleteComment(postId: number, commentId: number) {
       try {
-        await axiosComment.delete(`/api/posts/${postId}/comments/${commentId}`);
+        await axiosComment.delete(`/api/comments/${commentId}`);
         await this.fetchComments(postId); // Refresh the comments list after deleting
         notyf.success("Comment deleted successfully!");
       } catch (error) {

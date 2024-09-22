@@ -44,24 +44,56 @@
         <div
           v-for="comment in comments"
           :key="comment.id"
-          class="mb-4 p-4 border border-gray-200 rounded-lg"
+          class="mb-4 p-4 border border-gray-200 rounded-lg relative"
         >
-          <p class="text-gray-600 font-semibold">{{ comment.user_id }}</p>
-          <p class="text-gray-700">{{ comment.content }}</p>
-          <button
-            v-if="canDeleteComment(comment)"
-            @click="deleteComment(comment.id)"
+          <div v-if="editingCommentId === comment.id">
+            <input
+              v-model="editedComment"
+              type="text"
+              class="border border-gray-300 rounded-lg p-2 w-full mb-2"
+            />
+            <button
+              @click="updateComment(comment.id)"
+              class="text-white bg-green-500 hover:bg-green-600 py-2 px-4 rounded-lg shadow transition"
+            >
+              Update
+            </button>
+            <button
+              @click="cancelEdit"
+              class="text-white bg-gray-500 hover:bg-gray-600 py-2 px-4 rounded-lg shadow transition ml-2"
+            >
+              Cancel
+            </button>
+          </div>
+          <div v-else>
+            <p class="text-gray-600 font-semibold">{{ comment.user_id }}</p>
+            <p class="text-gray-700">{{ comment.content }}</p>
+          </div>
+
+          <div
+            v-if="canDeleteUpdateComment(comment.user_id)"
+            class="absolute top-0 right-0 me-2"
           >
-            Delete
-          </button>
+            <button
+              @click="startEdit(comment)"
+              class="text-blue-500 hover:text-blue-600"
+            >
+              Edit
+            </button>
+            <button
+              @click="deleteComment(comment.id)"
+              class="text-red-500 hover:text-red-600 ml-2"
+            >
+              X
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 <script lang="ts">
-import { defineComponent, ref, onMounted, computed } from "vue";
+import { defineComponent, ref, onMounted, computed, watch } from "vue";
 import { useBlogStore, BlogPost } from "@/stores/blogPostStore";
 import { useUserStore } from "@/stores/userStore";
 import { useCommentStore, Comment } from "@/stores/commentStore";
@@ -77,6 +109,8 @@ export default defineComponent({
     const post = ref<BlogPost | null>(null);
     const comments = ref<Comment[] | null>(null);
     const newComment = ref("");
+    const editedComment = ref("");
+    const editingCommentId = ref<number | null>(null);
     const postId = Number(route.params.id);
 
     const deletePost = async (postId: number) => {
@@ -97,26 +131,57 @@ export default defineComponent({
       return userStore.user?.id === post.value?.author.id;
     });
 
-    const addComment = () => {
+    const addComment = async () => {
       const content = newComment.value.trim();
-      if (content && postId) {
-        commentStore.addComment(postId, content);
+      const user_id = userStore.user?.id;
+      if (content && !isNaN(postId) && user_id) {
+        const data = {
+          user_id,
+          content,
+          post_id: postId,
+        };
+        await commentStore.addComment(data);
         newComment.value = "";
       }
     };
 
-    const deleteComment = (commentId: number) => {
-      commentStore.deleteComment(postId, commentId);
+    const deleteComment = async (commentId: number) => {
+      await commentStore.deleteComment(postId, commentId);
     };
 
-    const canDeleteComment = (user_id: number) => {
-      return userStore.user?.id === user_id || userStore.user?.id === user_id;
+    const canDeleteUpdateComment = (user_id: number) => {
+      return userStore.user?.id === user_id;
     };
+
+    const startEdit = (comment: Comment) => {
+      editingCommentId.value = comment.id;
+      editedComment.value = comment.content;
+    };
+
+    const updateComment = async (commentId: number) => {
+      const content = editedComment.value.trim();
+      if (content) {
+        await commentStore.updateComment(postId, commentId, content);
+        editingCommentId.value = null;
+        editedComment.value = "";
+      }
+    };
+
+    const cancelEdit = () => {
+      editingCommentId.value = null;
+      editedComment.value = "";
+    };
+
+    watch(
+      () => commentStore.comments,
+      (newComments) => {
+        comments.value = newComments;
+      }
+    );
 
     onMounted(async () => {
       await loadPost();
       await commentStore.fetchComments(postId);
-      comments.value = commentStore.comments;
     });
 
     return {
@@ -127,7 +192,12 @@ export default defineComponent({
       newComment,
       addComment,
       deleteComment,
-      canDeleteComment,
+      canDeleteUpdateComment,
+      startEdit,
+      updateComment,
+      cancelEdit,
+      editingCommentId,
+      editedComment,
     };
   },
 });

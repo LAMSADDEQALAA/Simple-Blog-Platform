@@ -3,6 +3,8 @@
 
 python manage.py migrate
 
+python manage.py clear_cache
+
 python manage.py delete_posts
 python manage.py delete_users
 

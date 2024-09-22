@@ -8,4 +8,4 @@ class Command(BaseCommand):
 
         User.objects.all().delete()
 
-        self.stdout.write(self.style.SUCCESS('BlogPost deletion completed.'))
+        self.stdout.write(self.style.SUCCESS('Users deletion completed.'))
