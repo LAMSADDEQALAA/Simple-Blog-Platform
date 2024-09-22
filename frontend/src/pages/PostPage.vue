@@ -156,7 +156,6 @@ export default defineComponent({
         .min(3, "Must be at least 3 characters"),
     });
 
-    // Form instances for both add and edit
     const addCommentForm = useForm({
       validationSchema: newCommentSchema,
       initialValues: { newComment: "" },

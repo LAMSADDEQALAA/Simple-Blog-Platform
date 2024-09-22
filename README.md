@@ -201,13 +201,11 @@ Incorporating debouncing into the search functionality results in a smoother, mo
 
 ### Comments Service (FastAPI)
 
-### Comments Endpoints
-
-- **Users**
+- **Comments**
   - **Endpoint**: `/api`
   - **Description**: Manage comments.
 
-#### Endpoints
+### Endpoints
 
 - **Get Comments for a Post**
   - **Endpoint**: `GET /posts/{post_id}/comments`
@@ -295,13 +293,11 @@ Incorporating debouncing into the search functionality results in a smoother, mo
 
 ### Core Service (Django DRF)
 
-### Users Endpoints
-
 - **Users**
   - **Endpoint**: `/api/users`
   - **Description**: Manage Authentication and users related data.
 
-#### Endpoints
+### Endpoints
 
 - **User Registration**
   - **Endpoint**: `POST /register/`
@@ -324,7 +320,7 @@ Incorporating debouncing into the search functionality results in a smoother, mo
       ```
     - **400 Bad Request**: If the input data is invalid.
 
-- **Get User Profile**
+- **Get User**
   - **Endpoint**: `GET /profile/`
   - **Description**: Retrieve the authenticated user's profile.
   - **Responses**:
@@ -396,8 +392,6 @@ Incorporating debouncing into the search functionality results in a smoother, mo
       ```
     - **401 Unauthorized**: If the refresh token is invalid.
 
-### Blog Post Endpoints
-
 - **Blog Posts**
   - **Endpoint**: `/api/BlogPosts/`
   - **Description**: Manage blog posts.
@@ -410,20 +404,25 @@ Incorporating debouncing into the search functionality results in a smoother, mo
   - **Responses**:
     - **200 OK**: Returns a list of blog posts.
       ```json
-      [
-          {
-              "id": 1,
-              "title": "First Blog Post",
-              "content": "This is the content.",
-              "author": 1
-          },
-          {
-              "id": 2,
-              "title": "Second Blog Post",
-              "content": "This is another content.",
-              "author": 2
-          }
-      ]
+      {
+      "count": 50,
+      "next": "http://127.0.0.1:8000/api/BlogPosts/?page=2",
+      "previous": null,
+      "results":[
+            {
+                "id": 1,
+                "title": "First Blog Post",
+                "content": "This is the content.",
+                "author": 1
+            },
+            {
+                "id": 2,
+                "title": "Second Blog Post",
+                "content": "This is another content.",
+                "author": 2
+            }
+        ]
+      }
       ```
     - **204 No Content**: If no posts are available.
 
@@ -441,10 +440,8 @@ Incorporating debouncing into the search functionality results in a smoother, mo
     - **201 Created**: Returns the created blog post.
       ```json
       {
-          "id": 3,
           "title": "New Blog Post",
           "content": "Content for the new blog post.",
-          "author": 1
       }
       ```
     - **401 Unauthorized**: If the user is not authenticated.
