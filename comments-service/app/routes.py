@@ -34,12 +34,18 @@ async def create_comment(comment: schemas.CommentCreate,user: dict = Depends(jwt
     db.add(new_comment)
     await db.commit()
     await db.refresh(new_comment)
-    await cache.delete(f"comments_post_{new_comment.post_id}")
-    return schemas.Comment.model_validate(new_comment)
+    cached_comments = await cache.get(f"comments_post_{new_comment.post_id}")
+    comment_scheme = schemas.Comment.model_validate(new_comment)
+    
+    if cached_comments is not None:
+        cached_comments.append(comment_scheme.model_dump())
+        await cache.set(cache_key, cached_comments)
+        
+    return comment_scheme
 
 
 @comment_router.put("/comments/{comment_id}", status_code=status.HTTP_200_OK)
-async def update_comment(comment_id: int, comment: schemas.CommentUpdate,user: dict = Depends(jwt_validation) , db: AsyncSession = Depends(get_db)):
+async def update_comment(comment_id: int, comment: schemas.CommentUpdate,user: dict = Depends(jwt_validation) , db: AsyncSession = Depends(get_db)) -> schemas.Comment:
     existing_comment = await db.scalar(select(models.Comment).filter(models.Comment.id == comment_id))
     
     if existing_comment is None:
@@ -50,8 +56,16 @@ async def update_comment(comment_id: int, comment: schemas.CommentUpdate,user: d
     
     await db.commit()
     await db.refresh(existing_comment)
-    await cache.delete(f"comments_post_{existing_comment.post_id}")
-    return existing_comment
+    cached_comments = await cache.get(f"comments_post_{existing_comment.post_id}")
+    comment_scheme = schemas.Comment.model_validate(existing_comment)
+    
+    if cached_comments is not None:
+        for cached_comment in cached_comments:
+            if cached_comment["id"] == comment_id:
+                cached_comment.update(comment_scheme.model_dump())
+                break
+                
+    return comment_scheme
 
 @comment_router.delete("/comments/{comment_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_comment(comment_id: int,user: dict = Depends(jwt_validation) , db: AsyncSession = Depends(get_db)):
@@ -61,5 +75,10 @@ async def delete_comment(comment_id: int,user: dict = Depends(jwt_validation) , 
     
     await db.delete(existing_comment)
     await db.commit()
-    await cache.delete(f"comments_post_{existing_comment.post_id}")
+
+    cached_comments = await cache.get(f"comments_post_{existing_comment.post_id}")
+    if cached_comments is not None:
+        cached_comments = [comment for comment in cached_comments if comment["id"] != comment_id]
+        await cache.set(cache_key, cached_comments)
+        
     return
