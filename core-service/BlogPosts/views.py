@@ -36,6 +36,15 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+        cache.clear()
+
+    def perform_update(self, serializer):
+        serializer.save()
+        cache.clear()
+    
+    def perform_destroy(self, instance):
+        instance.delete()
+        cache.clear()
 
     def get_serializer_class(self):
         if self.action in ['create', 'update']:
