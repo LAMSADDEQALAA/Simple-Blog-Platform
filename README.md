@@ -459,8 +459,20 @@ Incorporating debouncing into the search functionality results in a smoother, mo
   - **Endpoint**: `/api/BlogPosts/{post_id}/`
   - **Request Body**: 
     - `BlogPostCreateUpdateSerializer` schema.
+      ```json
+      {
+          "title": "Updated Blog Post",
+          "content": "Content for the updated blog post."
+      }
+      ```
   - **Responses**:
     - **200 OK**: Returns the updated blog post.
+      ```json
+      {
+          "title": "Updated Blog Post",
+          "content": "Content for the updated blog post."
+      }
+      ```
     - **404 Not Found**: If the post does not exist.
     - **401 Unauthorized**: If the user is not authenticated.
 
