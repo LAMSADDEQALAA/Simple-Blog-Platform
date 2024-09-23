@@ -70,7 +70,7 @@ export const useCommentStore = defineStore("comment", {
         const response = await axiosCore.get("/api/users/", {
           params: { ids: userIds.join(",") },
         });
-        this.users = response.data.results;
+        this.users = response.data;
       } catch (error) {
         handleError(error);
       }

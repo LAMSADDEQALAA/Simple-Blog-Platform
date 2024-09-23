@@ -10,11 +10,11 @@ from .middlewares import jwt_validation
 
 logger = logging.getLogger()
 comment_router = APIRouter(prefix="/api")
-
+cache_key_prefix = "comments_post_"
 
 @comment_router.get("/posts/{post_id}/comments",  status_code=status.HTTP_200_OK)
 async def read_comments(post_id: int,user: dict = Depends(jwt_validation) , db: AsyncSession = Depends(get_db)) -> List[schemas.Comment]:
-    cache_key = f"comments_post_{post_id}"
+    cache_key = f"{cache_key_prefix}{post_id}"
     cached_comments = await cache.get(cache_key)
 
     if cached_comments is not None:
@@ -23,8 +23,10 @@ async def read_comments(post_id: int,user: dict = Depends(jwt_validation) , db: 
 
     comments = await db.scalars(select(models.Comment).filter(models.Comment.post_id == post_id))
     comment_list = [schemas.Comment.model_validate(comment).model_dump() for comment in comments]
-
+    
+    await cache.set(cache_key, comment_list, ttl=60 * 15)
     logger.info("not returned from cache")
+    
     return comment_list
 
 
@@ -35,14 +37,11 @@ async def create_comment(comment: schemas.CommentCreate,user: dict = Depends(jwt
     await db.commit()
     await db.refresh(new_comment)
     
-    cache_key = f"comments_post_{new_comment.post_id}"
-    cached_comments = await cache.get(cache_key)
-    comment_scheme = schemas.Comment.model_validate(new_comment)
+    cache_key = f"{cache_key_prefix}{new_comment.post_id}"
+    await cache.delete(cache_key)
     
-    if cached_comments is not None:
-        cached_comments.append(comment_scheme.model_dump())
-        await cache.set(cache_key, cached_comments)
-        
+    comment_scheme = schemas.Comment.model_validate(new_comment)
+      
     return comment_scheme
 
 
@@ -59,17 +58,10 @@ async def update_comment(comment_id: int, comment: schemas.CommentUpdate,user: d
     await db.commit()
     await db.refresh(existing_comment)
     
-    cache_key = f"comments_post_{existing_comment.post_id}"
-    cached_comments = await cache.get(cache_key)
-    comment_scheme = schemas.Comment.model_validate(existing_comment)
+    cache_key = f"{cache_key_prefix}{existing_comment.post_id}"
+    await cache.delete(cache_key)
     
-    if cached_comments is not None:
-        for cached_comment in cached_comments:
-            if cached_comment["id"] == comment_id:
-                cached_comment.update(comment_scheme.model_dump())
-                break
-                
-        await cache.set(cache_key, cached_comments)
+    comment_scheme = schemas.Comment.model_validate(existing_comment)
                 
     return comment_scheme
 
@@ -82,11 +74,7 @@ async def delete_comment(comment_id: int,user: dict = Depends(jwt_validation) , 
     await db.delete(existing_comment)
     await db.commit()
 
-    cache_key = f"comments_post_{existing_comment.post_id}"
-    cached_comments = await cache.get(cache_key)
-    
-    if cached_comments is not None:
-        cached_comments = [comment for comment in cached_comments if comment["id"] != comment_id]
-        await cache.set(cache_key, cached_comments)
+    cache_key = f"{cache_key_prefix}{existing_comment.post_id}"
+    await cache.delete(cache_key)
         
     return
