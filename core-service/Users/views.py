@@ -23,6 +23,7 @@ class UserDetailView(RetrieveAPIView):
 
 class UsersByIdsView(ListAPIView):
     serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user_ids = self.request.query_params.get('ids', '')
