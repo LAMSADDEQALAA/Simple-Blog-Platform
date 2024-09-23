@@ -199,6 +199,14 @@ Incorporating debouncing into the search functionality results in a smoother, mo
 
 ## API Documentation
 
+- Note: All routes, except for user registration, require an authorization token. You can obtain the token via the Core Service endpoint `/api/user/token/` using valid login credentials. This token must be included in the request headers for authentication purposes.
+  
+  ```json
+  {
+     "Authorization": "Bearer your_access_token",
+  }
+  ```
+  
 ### Comments Service (FastAPI)
 
 - **Comments**
