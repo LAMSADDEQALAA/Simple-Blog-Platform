@@ -5,7 +5,7 @@ import HomePage from "../pages/HomePage.vue";
 import PostPage from "../pages/PostPage.vue";
 import CreateEditPostPage from "../pages/CreateEditPostPage.vue";
 import { useUserStore } from "@/stores/userStore";
-
+import axios from "axios";
 const routes = [
   { path: "/login", component: LoginPage },
   { path: "/register", component: RegisterPage },
@@ -40,12 +40,27 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
   const isAuthenticated = !!userStore.token;
+  const refreshToke = !!userStore.refreshToken;
 
-  if (to.meta.requiresAuth && !isAuthenticated) {
+  if (to.meta.requiresAuth && !isAuthenticated && !refreshToke) {
     next({ path: "/login" });
-  } else {
-    next();
+    return;
   }
+  if (to.meta.requiresAuth && !isAuthenticated && refreshToke) {
+    axios
+      .post(
+        `${process.env.VUE_APP_CORE_SERVICE_URL}/api/users/token/refresh/`,
+        {
+          refresh: userStore.refreshToken,
+        }
+      )
+      .then((response) => {
+        userStore.token = response.data.access;
+        next("/");
+      });
+    return;
+  }
+  next();
 });
 
 export default router;

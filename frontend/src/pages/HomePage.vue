@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, onMounted, watch } from "vue";
 import { useBlogStore } from "../stores/blogPostStore";
 import BlogPostCard from "../components/BlogPostCard.vue";
 import BlogPagination from "../components/BlogPagination.vue";
@@ -50,6 +50,13 @@ export default defineComponent({
       currentPage.value = 1;
       await loadPosts();
     };
+
+    watch(
+      () => blogStore.posts,
+      async (newPosts) => {
+        posts.value = newPosts;
+      }
+    );
 
     onMounted(loadPosts);
 

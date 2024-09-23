@@ -19,7 +19,7 @@ export const useUserStore = defineStore("user", {
     user: localStorage.getItem("user")
       ? JSON.parse(localStorage.getItem("user") as string)
       : null,
-    token: localStorage.getItem("access_token") || null,
+    token: null,
     refreshToken: localStorage.getItem("refresh_token") || null,
   }),
   actions: {
@@ -41,9 +41,10 @@ export const useUserStore = defineStore("user", {
         if (!this.token || !this.refreshToken) {
           throw new Error("Failed to authenticate");
         }
-
-        localStorage.setItem("access_token", this.token);
         localStorage.setItem("refresh_token", this.refreshToken);
+
+        await this.getUserData();
+
         notyf.success("loged in successfuly!");
       } catch (error) {
         handleError(error);
@@ -56,7 +57,6 @@ export const useUserStore = defineStore("user", {
         if (this.user != null) {
           localStorage.setItem("user", JSON.stringify(this.user));
         }
-        notyf.success("Retrieved user data successfuly!");
       } catch (error) {
         handleError(error);
       }

@@ -94,12 +94,13 @@ export default defineComponent({
         validationSchema: schema,
       });
 
-    const submitForm = handleSubmit(async () => {
-      await userStore.register({
-        username: values.username,
-        password: values.password,
-      });
-      router.push("/login");
+    const submitForm = handleSubmit(() => {
+      userStore
+        .register({
+          username: values.username,
+          password: values.password,
+        })
+        .then(() => router.push("/login"));
     });
 
     return {

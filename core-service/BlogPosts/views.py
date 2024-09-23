@@ -6,6 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.core.cache import cache
 from .pagination import BlogPostPagination
 from .permissions import IsAuthorOrReadOnly 
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
 
 class BlogPostViewSet(viewsets.ModelViewSet):
     queryset = BlogPost.objects.all()
@@ -36,15 +38,18 @@ class BlogPostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
-        cache.clear()
+        self.invalidate_cache()
 
     def perform_update(self, serializer):
         serializer.save()
-        cache.clear()
+        self.invalidate_cache()
     
     def perform_destroy(self, instance):
         instance.delete()
-        cache.clear()
+        self.invalidate_cache()
+    
+    def invalidate_cache(self):
+        cache.delete_pattern('blog_posts_*')
 
     def get_serializer_class(self):
         if self.action in ['create', 'update']:

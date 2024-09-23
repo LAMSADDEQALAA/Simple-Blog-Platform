@@ -30,6 +30,7 @@
 import { defineComponent, computed } from "vue";
 import { useUserStore } from "@/stores/userStore";
 import { useBlogStore } from "@/stores/blogPostStore";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   props: {
@@ -38,6 +39,7 @@ export default defineComponent({
   setup(props) {
     const userStore = useUserStore();
     const blogStore = useBlogStore();
+    const router = useRouter();
 
     const canEditOrDelete = computed(() => {
       return userStore.user?.id === props.post?.author.id;
@@ -47,6 +49,7 @@ export default defineComponent({
       const confirmed = confirm("Are you sure you want to delete this post?");
       if (confirmed) {
         await blogStore.deletePost(postId);
+        router.push("/");
       }
     };
 

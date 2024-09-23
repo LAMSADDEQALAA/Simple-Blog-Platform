@@ -38,8 +38,6 @@ const createAxiosInstance = (baseURL: string) => {
           );
 
           userStore.token = response.data.access;
-          if (userStore.token)
-            localStorage.setItem("access_token", userStore.token);
 
           axios.defaults.headers.common.Authorization = `Bearer ${userStore.token}`;
 

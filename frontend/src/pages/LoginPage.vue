@@ -72,13 +72,13 @@ export default defineComponent({
         validationSchema: schema,
       });
 
-    const submitForm = handleSubmit(async () => {
-      await userStore.login({
-        username: values.username,
-        password: values.password,
-      });
-      await userStore.getUserData();
-      router.push("/");
+    const submitForm = handleSubmit(() => {
+      userStore
+        .login({
+          username: values.username,
+          password: values.password,
+        })
+        .then(() => router.push("/"));
     });
 
     return {
