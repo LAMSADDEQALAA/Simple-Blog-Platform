@@ -17,24 +17,11 @@ class BlogPostViewSet(viewsets.ModelViewSet):
     search_fields = ['title', 'content']
     pagination_class = BlogPostPagination
 
+    CACHE_TIMEOUT = 60 * 15  # Cache for 15 minutes
+
+    @method_decorator(cache_page(CACHE_TIMEOUT))
     def list(self, request, *args, **kwargs):
-        cache_key = f'blog_posts_{request.query_params.urlencode()}'
-        cached_response = cache.get(cache_key)
-
-        if cached_response:
-            print("returned from cache")
-            return Response(cached_response)
-
-        queryset = self.filter_queryset(self.get_queryset())
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            paginated_response = self.get_paginated_response(serializer.data).data
-            cache.set(cache_key, paginated_response, 60 * 15)
-            print("not returned from cache")
-            return Response(paginated_response)
-
-        return Response({"detail": "No data available"}, status=204)
+        return super().list(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -49,7 +36,7 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         self.invalidate_cache()
     
     def invalidate_cache(self):
-        cache.delete_pattern('blog_posts_*')
+        cache.clear()
 
     def get_serializer_class(self):
         if self.action in ['create', 'update']:
