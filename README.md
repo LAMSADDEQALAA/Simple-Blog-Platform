@@ -47,7 +47,7 @@ The Blog Platform is a full-stack application consisting of a Django REST Framew
     POSTGRES_HOST=localhost
     POSTGRES_PORT=5432
     # REDIS
-    REDIS_URL=redis://localhost:6379
+    REDIS_URL=redis://localhost:6379/0
     ```
 
   - For **FastAPI**:
@@ -62,7 +62,7 @@ The Blog Platform is a full-stack application consisting of a Django REST Framew
     SIGNING_KEY=your_shared_signing_key
     SIGNING_ALGORITHM=HS256
     # REDIS
-    REDIS_URL=redis://localhost:6379
+    REDIS_URL=redis://localhost:6379/1
     ```
 
   - For **Vue.js**:
