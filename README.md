@@ -9,6 +9,7 @@ The Blog Platform is a full-stack application consisting of a Django REST Framew
 - **User Registration and Authentication**: Users can register and log in using JWT.
 - **Blog Management**: Create, read, update, and delete blog posts.
 - **Comment System**: Users can add comments to blog posts, managed by a FastAPI service.
+- **Object Permissions**: Only the author of a post or comment can update or delete their own content.
 - **Caching**: Utilizes Redis for caching blog posts and comments to optimize performance.
 
 ## Database Information
