@@ -1,5 +1,6 @@
 from pydantic import BaseModel, constr, conint, validator, ConfigDict
 
+
 class CommentBase(BaseModel):
     content: constr(min_length=1, max_length=500)
     user_id: conint(gt=0)
